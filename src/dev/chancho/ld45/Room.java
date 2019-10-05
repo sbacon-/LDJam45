@@ -41,6 +41,43 @@ public class Room {
 		if(mapY>0)changeDoor(0, map.get((mapY*8)+mapX-8).getDoors().get(2));
 		exclusions.clear();
 	}
+	@SuppressWarnings("unchecked")
+	public ArrayList<Room> finalizeMap(ArrayList<Room> map){
+		ArrayList<HashSet<Integer>> paths = new ArrayList<HashSet<Integer>>();
+		for(Room init: map) {
+			HashSet<Integer> path = new HashSet<Integer>();
+			path.add(map.indexOf(init));
+			boolean haspath = true;
+			while(haspath) {
+				HashSet<Integer> current = (HashSet<Integer>) path.clone();
+				int delta=current.size();
+				for(Integer room : current) {
+					ArrayList<Boolean> doors = map.get(room).getDoors();
+					if(doors.get(0))path.add(room-8);
+					if(doors.get(1))path.add(room+1);
+					if(doors.get(2))path.add(room+8);
+					if(doors.get(3))path.add(room-1);
+				}
+				if(path.size()-delta==0)haspath=false;
+			}
+			paths.add(path);
+		}
+		HashSet<Integer> maxPath = new HashSet<Integer>();
+		for(HashSet<Integer> path : paths) {
+			if(path.size()>maxPath.size())maxPath=(HashSet<Integer>) path.clone();
+		}
+		ArrayList<Room> newMap = new ArrayList<Room>();
+		Room eRoom = new Room(0,0,null);
+		eRoom.changeDoor(0, false);
+		eRoom.changeDoor(1, false);
+		eRoom.changeDoor(2, false);
+		eRoom.changeDoor(3, false);
+		for(int r = 0;r<32;r++){
+			if(maxPath.contains(r))newMap.add(map.get(r));
+			else newMap.add(eRoom);
+		}
+		return newMap;
+	}
 	public int getLayout() {
 		int result=0;
 		if(getDoors().get(0))result+=8;

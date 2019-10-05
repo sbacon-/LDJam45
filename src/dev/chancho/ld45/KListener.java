@@ -7,10 +7,21 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class KListener implements KeyListener, MouseListener, MouseMotionListener{
+	private boolean N,S,E,W;
 	public int xdir=0;
 	public int ydir=0;
 	public int mx = -1;
 	public int my = -1;
+	
+	public void updateKeyState() {
+		if(N && !S)ydir = -1;
+		else if(S && !N)ydir = 1;
+		else ydir=0;
+		
+		if(E && !W)xdir = 1;
+		else if(W && !E)xdir = -1;
+		else xdir=0;
+	}
 	
 	//MOUSE
 	@Override
@@ -25,8 +36,10 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 
 	@Override
 	public void mouseExited(MouseEvent m) {
-		// TODO Auto-generated method stub
-		
+		N=false;
+		E=false;
+		S=false;
+		W=false;
 	}
 
 	@Override
@@ -59,18 +72,18 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 	@Override
 	public void keyPressed(KeyEvent k) {
 		int key = k.getKeyCode();
-		if(key==KeyEvent.VK_W)ydir=-1;
-		if(key==KeyEvent.VK_S)ydir=1;
-		if(key==KeyEvent.VK_D)xdir=1;
-		if(key==KeyEvent.VK_A)xdir=-1;
+		if(key==KeyEvent.VK_W||key==KeyEvent.VK_UP)N=true;
+		if(key==KeyEvent.VK_D||key==KeyEvent.VK_RIGHT)E=true;
+		if(key==KeyEvent.VK_S||key==KeyEvent.VK_DOWN)S=true;
+		if(key==KeyEvent.VK_A||key==KeyEvent.VK_LEFT)W=true;
 	}
 	@Override
 	public void keyReleased(KeyEvent k) {
 		int key = k.getKeyCode();
-		if(key==KeyEvent.VK_W)ydir=0;
-		if(key==KeyEvent.VK_S)ydir=0;
-		if(key==KeyEvent.VK_D)xdir=0;
-		if(key==KeyEvent.VK_A)xdir=0;
+		if(key==KeyEvent.VK_W||key==KeyEvent.VK_UP)N=false;
+		if(key==KeyEvent.VK_D||key==KeyEvent.VK_RIGHT)E=false;
+		if(key==KeyEvent.VK_S||key==KeyEvent.VK_DOWN)S=false;
+		if(key==KeyEvent.VK_A||key==KeyEvent.VK_LEFT)W=false;
 	}
 
 	@Override

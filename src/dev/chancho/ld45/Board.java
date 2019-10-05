@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Random;
@@ -49,6 +50,8 @@ public class Board extends JPanel implements Runnable{
 				map.add(new Room(x,y,map));
 			}
 		}
+		Room room = new Room(-1,-1,null);
+		map = room.finalizeMap(map);
 		Random rand= new Random();
 		currentroomIndex = rand.nextInt(32);
 		while(!map.get(currentroomIndex).setStart()) {
@@ -60,13 +63,14 @@ public class Board extends JPanel implements Runnable{
 	}
 	
 	private void tick() {
-		time++;
+		kAdapter.updateKeyState();
+		time++;		
 		if(time%2==0)movePlayer();
 	}
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if(time>100)render(g);
+		if(time>1000)render(g);
 		//ADD MENU RENDER HERE
 		else splash(g);
 	}
@@ -128,6 +132,20 @@ public class Board extends JPanel implements Runnable{
 		
 		
 		g.drawImage(e.getTile(0, 1).getScaledInstance(SCALE*2, SCALE*2, Image.SCALE_DEFAULT), player.getX(), player.getY(),this);
+		/*
+		//COLLISION TEST
+		g.setColor(Color.red);//N
+		g.drawRect(player.getX()+SCALE/2,player.getY(),SCALE,SCALE/2);
+		g.setColor(Color.orange);//E		
+		g.drawRect(player.getX()+SCALE+SCALE/2,player.getY()+SCALE/2,SCALE/2,SCALE);
+		g.setColor(Color.yellow);//S
+		g.drawRect(player.getX()+SCALE/2,player.getY()+SCALE+SCALE/2,SCALE,SCALE/2);
+		g.setColor(Color.green);//W
+		g.drawRect(player.getX(),player.getY()+SCALE/2,SCALE/2,SCALE);
+		
+		g.setColor(Color.cyan);
+		g.drawRect(19*48,((4+2)*48),48,48);
+		*/		
 		Toolkit.getDefaultToolkit().sync();
 	}	
 	private void splash(Graphics g) {
@@ -135,12 +153,57 @@ public class Board extends JPanel implements Runnable{
 		Toolkit.getDefaultToolkit().sync();
 	}
 	public void movePlayer() {
-		player.setX(player.getX()+kAdapter.xdir);
-		player.setY(player.getY()+kAdapter.ydir);
+		checkCollision();
+		int xdir = kAdapter.xdir;
+		int ydir = kAdapter.ydir;
+		player.setX(player.getX()+xdir);
+		player.setY(player.getY()+ydir);
 		player.setTargetX(kAdapter.mx);
 		player.setTargetY(kAdapter.my);
 	}
-	
+	private void checkCollision() {
+		int x = player.getX()+SCALE;
+		int y = player.getY()+SCALE;
+		while(x>48)x/=48;
+		while(y>48)y/=48;
+		if(y>12)y=2;
+		if(x>20)x=0;
+		y-=2;
+		Rectangle playerN = new Rectangle(player.getX()+SCALE/2,player.getY(),SCALE,SCALE/2);
+		Rectangle playerE = new Rectangle(player.getX()+SCALE+SCALE/2,player.getY()+SCALE/2,SCALE/2,SCALE);
+		Rectangle playerS = new Rectangle(player.getX()+SCALE/2,player.getY()+SCALE+SCALE/2,SCALE,SCALE/2);
+		Rectangle playerW = new Rectangle(player.getX(),player.getY()+SCALE/2,SCALE/2,SCALE);
+		if(y>0 && kAdapter.ydir<0&& currentRoom.get((20*(y-1))+x)==1&& playerN.intersects(new Rectangle(x*48,((y+1)*48),48,48)))kAdapter.ydir=0;
+		if(y<9 && kAdapter.ydir>0 && currentRoom.get((20*(y+1))+x)==1 && playerS.intersects(new Rectangle(x*48,((y+3)*48),48,48)))kAdapter.ydir=0;
+		if(x>0 && kAdapter.xdir<0&& currentRoom.get((20*y)+x-1)==1 && playerW.intersects(new Rectangle((x-1)*48,(y+2)*48,48,48)))kAdapter.xdir=0;
+		if(x<19 && kAdapter.xdir>0&& currentRoom.get((20*y)+x+1)==1 && playerE.intersects(new Rectangle((x+1)*48,(y+2)*48,48,48)))kAdapter.xdir=0;
+		if(y==0) {
+			System.out.println(currentroomIndex);
+			currentroomIndex-=8;
+			currentRoom = e.buildRoom(map.get(currentroomIndex));
+			player.setY(480);
+		}
+		if(y==9) {
+			System.out.println(currentroomIndex);
+			currentroomIndex+=8;
+			currentRoom = e.buildRoom(map.get(currentroomIndex));
+			player.setY(145);
+		}
+		if(x==0) {
+			System.out.println(currentroomIndex);
+			currentroomIndex-=1;
+			currentRoom = e.buildRoom(map.get(currentroomIndex));
+			player.setX(858);
+		}
+		if(x==19) {
+			System.out.println(currentroomIndex);
+			currentroomIndex+=1;
+			currentRoom = e.buildRoom(map.get(currentroomIndex));
+			player.setX(48);
+		}
+		
+		System.out.println(player.getX()+" "+player.getY());
+	}
 	
 	
 	@Override

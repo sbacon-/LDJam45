@@ -13,7 +13,6 @@ public class Frame extends JFrame{
 		add(new Board());
 		setResizable(false);
 		pack();
-		
 		setTitle("TITLE - made for LD45");
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
