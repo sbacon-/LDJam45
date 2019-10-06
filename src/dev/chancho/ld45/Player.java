@@ -1,26 +1,51 @@
 package dev.chancho.ld45;
 
+import java.awt.Rectangle;
+
 public class Player {
 	private int x,y;
+	public Projectile attack;
 	private int targetx,targety;
-	private int ammo,bombs,coins;
-	public Player(int x, int y){
+	public int ammo,bomb;
+	public int health, grace, bombcooldown;
+	public boolean gameOver;
+	public Player(int x, int y,int ammo,int bombs, int health){
+		this.health=health;
 		this.x = x;
 		this.y = y;
-		this.ammo=0;
-		this.bombs=0;
-		this.coins=0;		
+		this.ammo=ammo;
+		this.bomb=bombs;
+		this.attack = new Projectile(ammo,x,y,targetx,targety);
 	}
+	public void tick() {
+		if(grace>0)grace--;
+		if(attack.status){
+			attack = new Projectile(ammo,x,y,targetx,targety);
+		}
+		if(!attack.status)attack.tick();		
+		if(health==0)gameOver=true;
+		if(bombcooldown>0)bombcooldown--;
+	}
+	public void pickup(int pickup) {
+		switch(pickup) {
+		case 10:
+			ammo++;
+			break;
+		case 11:
+			bomb++;
+			break;
+		case 12:
+			if(health<5)health++;
+			break;
+		}		
+	}
+	
 	public int getAmmo() {
 		return ammo;
 	}
 	public int getBomb() {
-		return bombs;
-	}
-	public int getCoin() {
-		return coins;
-	}
-	
+		return bomb;
+	}	
 	public int getX() {
 		return x;
 	}
@@ -44,5 +69,14 @@ public class Player {
 	}
 	public void setTargetY(int y) {
 		this.targety=y;
+	}
+	public Rectangle getBounds() {
+		return new Rectangle(x,y,48,48);
+	}
+	public void damage() {
+		if(grace==0) {
+			health--;
+			grace=100;
+		}
 	}
 }

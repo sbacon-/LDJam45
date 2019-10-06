@@ -8,6 +8,7 @@ import java.awt.event.MouseMotionListener;
 
 public class KListener implements KeyListener, MouseListener, MouseMotionListener{
 	private boolean N,S,E,W;
+	public boolean clicked, space,reset;
 	public int xdir=0;
 	public int ydir=0;
 	public int mx = -1;
@@ -40,16 +41,20 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 		E=false;
 		S=false;
 		W=false;
+		clicked=false;
+		space = false;
 	}
 
 	@Override
 	public void mousePressed(MouseEvent m) {
+		clicked=true;
 		mx=m.getX();
 		my=m.getY();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent m) {
+		clicked=false;
 		mx=-1;
 		my=-1;
 	}
@@ -57,7 +62,6 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 	//MOUSE MOTION
 	@Override
 	public void mouseMoved(MouseEvent m) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -76,6 +80,8 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 		if(key==KeyEvent.VK_D||key==KeyEvent.VK_RIGHT)E=true;
 		if(key==KeyEvent.VK_S||key==KeyEvent.VK_DOWN)S=true;
 		if(key==KeyEvent.VK_A||key==KeyEvent.VK_LEFT)W=true;
+		if(key == KeyEvent.VK_ENTER)reset=true;
+		if(key==KeyEvent.VK_SPACE) space=true;
 	}
 	@Override
 	public void keyReleased(KeyEvent k) {
@@ -84,11 +90,11 @@ public class KListener implements KeyListener, MouseListener, MouseMotionListene
 		if(key==KeyEvent.VK_D||key==KeyEvent.VK_RIGHT)E=false;
 		if(key==KeyEvent.VK_S||key==KeyEvent.VK_DOWN)S=false;
 		if(key==KeyEvent.VK_A||key==KeyEvent.VK_LEFT)W=false;
+		if(key==KeyEvent.VK_SPACE) space=false;
 	}
 
 	@Override
 	public void keyTyped(KeyEvent k) {
-		// TODO Auto-generated method stub
 		
 	}
 }
